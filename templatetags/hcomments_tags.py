@@ -12,7 +12,6 @@ register = template.Library()
 @register.inclusion_tag('hcomments/show_comment_list.html', takes_context = True)
 def show_comment_list(context, object):
     ctype = ContentType.objects.get_for_model(object)
-    print repr(ctype), ctype.id
     tree = models.HComment.tree.root_nodes().filter(
         content_type = ctype,
         object_pk = object.id,
