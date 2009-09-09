@@ -1,0 +1,23 @@
+<div id="comments">
+    <h3>{{ comments|length }} Commenti (<a href="#add-comment">Aggiungi Commento</a>)</h3>
+    <ol>
+        {% for c in comments %}
+        <li id="comment-{{ c.id }}" class="comment-level-{{ c.level }}">
+          <div class="copy">
+            {{ c.comment|linebreaksbr }}
+          </div>          
+          <div class="metadata" {% if forloop.last %}id="last-comment"{% endif %}>
+            {% with c.userinfo as info %}
+            {% if info.url %}
+                <strong><a href="{{ info.url }}" rel="nofollow">{{ info.name }}</a></strong>,
+            {% else %}
+                <strong>{{ info.name }}</strong>,
+            {% endif %}
+            <span class="date"><a title="Permalink a questo commento" href="#microblog-comment-{{ c.id}}">{{ c.submit_date|date:"d F Y" }}</a> alle {{ c.submit_date|date:"H:i" }}
+            </span>
+            {% endwith %}
+          </div>          
+        </li>
+        {% endfor %}
+    </ol>
+</div>
