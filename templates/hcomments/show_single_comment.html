@@ -1,4 +1,6 @@
+{% load hcomments_tags %}
 <li id="comment-{{ c.id }}" class="comment-level-{{ c.level }}{% if owner %} user-comment{% endif %}">
+  <div class="gravatar"><img src="{{ c.userinfo.email|gravatar:"default=identicon,size=40" }}" alt="gravatar" /></div>
   <div class="copy">
     {{ c.comment|linebreaksbr }}
   </div>

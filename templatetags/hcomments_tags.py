@@ -7,6 +7,9 @@ import mptt.utils
 
 from hcomments import models
 
+import hashlib
+import urllib
+
 register = template.Library()
 
 @register.inclusion_tag('hcomments/show_comment_list.html', takes_context = True)
@@ -33,3 +36,27 @@ def show_single_comment(context, comment):
         'c': comment,
         'owner': owner,
     }
+
+@register.filter
+def gravatar(email, args=''):
+    if args:
+        args = dict(a.split('=') for a in args.split(','))
+    else:
+        args = {}
+
+    # Set your variables here
+    default = args.get('default', '404')
+    size = args.get('size', '80')
+    rating = args.get('rating', 'r')
+
+    print args
+
+    # construct the url
+    gravatar_url = 'http://www.gravatar.com/avatar/%s?' % hashlib.md5(email.lower()).hexdigest()
+    gravatar_url += urllib.urlencode({
+        'default': default,
+        'size': str(size),
+        'rating': rating,
+    })
+    return gravatar_url
+
