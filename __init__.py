@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-
 from django.core.urlresolvers import reverse
 
 from hcomments import models
@@ -11,3 +10,5 @@ def get_model():
 def get_form():
     return forms.HCommentForm
 
+def get_form_target():
+    return reverse('hcomments-post-comment')

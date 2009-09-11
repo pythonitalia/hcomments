@@ -24,6 +24,12 @@ def show_comment_list(context, object):
 
 @register.inclusion_tag('hcomments/show_single_comment.html', takes_context = True)
 def show_single_comment(context, comment):
+    request = context['request']
+    if 'user-comments' in request.session:
+        owner = comment.id in request.session['user-comments']
+    else:
+        owner = False
     return {
         'c': comment,
+        'owner': owner,
     }
