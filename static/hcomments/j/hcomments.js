@@ -66,6 +66,8 @@ hcomments = {
     _onReplyComment: function(e) {
         e.preventDefault();
         var p = $(e.target).parent('li');
+        if($('form', p).length)
+            return;
         var id = p.attr('id').split('-')[1];
         var form = this.form.clone();
         $('input[name="parent"]', form).val(id);
