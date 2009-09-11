@@ -19,6 +19,11 @@ def show_comment_list(context, object):
     comments = []
     for root in tree:
         comments.extend(root.get_descendants(True))
+    context.update({ 'comments': comments })
+    return context
+
+@register.inclusion_tag('hcomments/show_single_comment.html', takes_context = True)
+def show_single_comment(context, comment):
     return {
-        'comments': comments,
+        'c': comment,
     }

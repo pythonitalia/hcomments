@@ -1,0 +1,17 @@
+<li id="comment-{{ c.id }}" class="comment-level-{{ c.level }}{% if owner %} user-comment{% endif %}">
+  <div class="copy">
+    {{ c.comment|linebreaksbr }}
+  </div>
+  <div class="metadata" {% if forloop.last %}id="last-comment"{% endif %}>
+    {% with c.userinfo as info %}
+    {% if info.url %}
+        <strong><a href="{{ info.url }}" rel="nofollow">{{ info.name }}</a></strong>,
+    {% else %}
+        <strong>{{ info.name }}</strong>,
+    {% endif %}
+    <span class="date"><a title="Permalink a questo commento" href="#hcomment-{{ c.id}}">{{ c.submit_date|date:"d F Y" }}</a> alle {{ c.submit_date|date:"H:i" }}
+    </span>
+    {% endwith %}
+  </div>
+</li>
+
