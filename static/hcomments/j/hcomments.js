@@ -78,7 +78,6 @@ hcomments = {
                 },
                 success: bind(function(data, textStatus) {
                     var data = this.filterOut($(data));
-                    console.log(data);
                     if(data) {
                         data
                             .hide()
