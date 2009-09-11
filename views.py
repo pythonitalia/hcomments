@@ -35,3 +35,22 @@ def post_comment(request):
                 },
                 context_instance = RequestContext(request)
             )
+
+def delete_comment(request):
+    if request.method != 'POST':
+        raise http.HttpResponseBadRequest()
+    try:
+        cid = int(request.POST['cid'])
+    except:
+        raise http.HttpResponseBadRequest()
+    s = request.session.get('user-comments', set())
+    if cid not in s:
+        raise http.HttpResponseBadRequest()
+    s.remove(cid)
+    try:
+        comment = models.HComment.objects.get(pk = cid)
+    except models.HComment.DoesNotExist:
+        pass
+    else:
+        comment.delete()
+    return http.HttpResponse('')

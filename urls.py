@@ -7,4 +7,8 @@ urlpatterns = patterns('',
         r'post$', 'hcomments.views.post_comment',
         name = 'hcomments-post-comment',
     ),
+    url(
+        r'delete$', 'hcomments.views.delete_comment',
+        name = 'hcomments-delete-comment',
+    ),
 )
