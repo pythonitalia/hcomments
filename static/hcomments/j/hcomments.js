@@ -48,9 +48,9 @@ hcomments = {
             return;
         if(!target)
             target = $('li.user-comment');
-        $('<a href="#" class="remove-comment">Remove this comment</a>')
+        $('<span><a href="#" class="remove-comment">Remove</a> |</span>')
             .click(bind(this._onRemoveComment, this))
-            .appendTo(target);
+            .insertBefore($('strong', target));
     },
     _onRemoveComment: function(e) {
         e.preventDefault();
@@ -62,9 +62,9 @@ hcomments = {
     addReplyLink: function(target) {
         if(!target)
             target = this.comments;
-        $('<a href="#" class="reply-comment">Reply</a>')
+        $('<span><a href="#" class="reply-comment">Reply</a> |</span>')
             .click(bind(this._onReplyComment, this))
-            .appendTo(target);
+            .insertBefore($('strong', target));
     },
     _onReplyComment: function(e) {
         e.preventDefault();
