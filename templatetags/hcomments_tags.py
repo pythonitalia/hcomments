@@ -18,6 +18,8 @@ def show_comment_list(context, object):
     tree = models.HComment.tree.root_nodes().filter(
         content_type = ctype,
         object_pk = object.id,
+        is_public = True,
+        is_removed = False,
     )
     comments = []
     for root in tree:
