@@ -25,6 +25,8 @@ def post_comment(request):
             except:
                 comment = None
             else:
+                if not comment.is_public:
+                    return http.HttpResponse(content = 'moderated', status = 403)
                 s = request.session.get('user-comments', set())
                 s.add(cid)
                 request.session['user-comments'] = s

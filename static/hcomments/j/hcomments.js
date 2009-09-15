@@ -15,7 +15,10 @@ hcomments = {
         this.form.append('<input type="hidden" name="async" value="1" />');
         o.form.ajaxForm({
             error: function(request, textStatus, errorThrown) {
-                alert('cannot post your comment');
+                if(request.status == 403)
+                    alert('Your comment has been moderated');
+                else
+                    alert('Cannot post your comment');
             },
             success: bind(function(data, textStatus) {
                 var data = this.filterOut($(data));
