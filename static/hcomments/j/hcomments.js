@@ -68,7 +68,7 @@ hcomments = {
     },
     _onReplyComment: function(e) {
         e.preventDefault();
-        var p = $(e.target).parent('li');
+        var p = $(e.target).parents('li');
         if($('form', p).length)
             return;
         var id = p.attr('id').split('-')[1];
