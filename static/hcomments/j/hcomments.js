@@ -71,9 +71,19 @@ hcomments = {
         var p = $(e.target).parents('li');
         if($('form', p).length)
             return;
+        $('li.replying form').remove();
+        $('li.replying').removeClass('replying');
+        p.addClass('replying');
         var id = p.attr('id').split('-')[1];
         var form = this.form.clone();
         $('input[name="parent"]', form).val(id);
+        $('<button>Cancel</button>')
+            .appendTo($('div.buttons', form))
+            .click(function(e) {
+                e.preventDefault();
+                form.remove();
+                p.removeClass('replying');
+            });
         form
             .ajaxForm({
                 error: function(request, textStatus, errorThrown) {
