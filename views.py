@@ -40,7 +40,7 @@ def post_comment(request):
 
 def delete_comment(request):
     if request.method != 'POST':
-        raise http.HttpResponseBadRequest()
+        return http.HttpResponseBadRequest()
     try:
         cid = int(request.POST['cid'])
     except:
