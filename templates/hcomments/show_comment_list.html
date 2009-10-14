@@ -1,6 +1,6 @@
 {% load hcomments_tags %}
 <div id="comments">
-    <h3>{{ comments|length }} Commenti (<a href="#add-comment">Aggiungi Commento</a>)</h3>
+    <h3>{{ comments|length }} {% trans "Commenti" %} (<a href="#add-comment">{% trans "Aggiungi Commento" %}</a>)</h3>
     <ol>
         {% for c in comments %}
         {% show_single_comment c %}

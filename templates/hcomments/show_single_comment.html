@@ -14,7 +14,7 @@
         {% else %}
             <strong>{{ info.name }}</strong>,
         {% endif %}
-        <span class="date"><a title="Permalink a questo commento" href="#comment-{{ c.id}}">{{ c.submit_date|date:"d F Y" }}</a> alle {{ c.submit_date|date:"H:i" }}
+	<span class="date"><a title="{% trans "Permalink a questo commento" %}" href="#comment-{{ c.id}}">{{ c.submit_date|date:"d F Y" }}</a> {% trans "alle" %} {{ c.submit_date|date:"H:i" }}
         </span>
     {% endwith %}
   </div>
