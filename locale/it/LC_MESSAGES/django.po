@@ -18,16 +18,16 @@ msgstr ""
 
 #: templates/hcomments/show_comment_list.html:3
 msgid "Commenti"
-msgstr ""
+msgstr "Commenti"
 
 #: templates/hcomments/show_comment_list.html:3
 msgid "Aggiungi Commento"
-msgstr ""
+msgstr "Aggiungi Commento"
 
 #: templates/hcomments/show_single_comment.html:17
 msgid "Permalink a questo commento"
-msgstr ""
+msgstr "Permalink a questo commento"
 
 #: templates/hcomments/show_single_comment.html:17
 msgid "alle"
-msgstr ""
+msgstr "alle"
