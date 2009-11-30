@@ -13,25 +13,7 @@ hcomments = {
         this.remove = o.remove || '';
 
         this.form.append('<input type="hidden" name="async" value="1" />');
-        o.form.ajaxForm({
-            error: function(request, textStatus, errorThrown) {
-                if(request.status == 403)
-                    alert('Your comment has been moderated');
-                else
-                    alert('Cannot post your comment');
-            },
-            success: bind(function(data, textStatus) {
-                var data = this.filterOut($(data));
-                if(data) {
-                    data
-                        .hide()
-                        .appendTo(this.wrapper)
-                        .fadeIn("slow");
-                    this.addRemoveLink(data);
-                    this.addReplyLink(data);
-                }
-            }, this)
-        });
+        this._prepareForm(o.form);
         this.addRemoveLink();
         this.addReplyLink();
     },
@@ -84,26 +66,39 @@ hcomments = {
                 form.remove();
                 p.removeClass('replying');
             });
-        form
-            .ajaxForm({
-                error: function(request, textStatus, errorThrown) {
-                    alert('cannot post your comment');
-                },
-                success: bind(function(data, textStatus) {
-                    var data = this.filterOut($(data));
-                    if(data) {
-                        data
-                            .hide()
-                            .insertAfter(p)
-                            .fadeIn("slow");
-                        this.addRemoveLink(data);
-                        this.addReplyLink(data);
-                    }
-                }, this),
-                complete: function() {
-                    form.remove();
-                }
-            })
+        this
+            ._prepareForm(form, p)
             .appendTo(p);
+    },
+    _prepareForm: function(form, comment) {
+        var opts = {
+            error: bind(function(request, textStatus, errorThrown) {
+                if(request.status == 403)
+                    this.onCommentModerated();
+                else
+                    this.onCommentPostFailed();
+            }, this),
+            success: bind(function(data, textStatus) {
+                var data = this.filterOut($(data));
+                if(data) {
+                    data
+                        .hide()
+                        .appendTo(comment ? comment : this.wrapper)
+                        .fadeIn("slow");
+                    this.addRemoveLink(data);
+                    this.addReplyLink(data);
+                }
+            }, this)
+        };
+        if(comment) {
+            opts.complete = function() { $(form).remove(); };
+        }
+        return form.ajaxForm(opts);
+    },
+    onCommentModerated: function(comment) {
+        alert('Your comment has been moderated');
+    },
+    onCommentPostFailed: function(comment) {
+        alert('Cannot post your comment');
     }
 };
