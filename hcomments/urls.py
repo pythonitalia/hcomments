@@ -11,4 +11,13 @@ urlpatterns = patterns('',
         r'delete$', 'hcomments.views.delete_comment',
         name = 'hcomments-delete-comment',
     ),
+    url(
+        r'private-comment/(?P<cid>\d+)$', 'hcomments.views.moderate_comment',
+        name = 'hcomments-privaye-comment',
+    ),
+    url(
+        r'public-comment/(?P<cid>\d+)$', 'hcomments.views.moderate_comment',
+        kwargs = { 'public': True },
+        name = 'hcomments-public-comment',
+    ),
 )

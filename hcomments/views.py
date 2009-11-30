@@ -1,13 +1,13 @@
 # -*- coding: UTF-8 -*-
+import urlparse
 
 from django import http
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.comments.views import comments as comments_views
+from django.shortcuts import get_object_or_404, render_to_response
+from django.template import RequestContext
 
 from hcomments import models
-
-import urlparse
 
 def post_comment(request):
     result = comments_views.post_comment(request)
@@ -56,3 +56,13 @@ def delete_comment(request):
     else:
         comment.delete()
     return http.HttpResponse('')
+
+@staff_member_required
+def moderate_comment(request, cid, public = False):
+    try:
+        comment = get_object_or_404(models.HComment, pk = int(cid))
+    except (TypeError, ValueError):
+        return http.HttpResponseBadRequest()
+    comment.is_public = public
+    comment.save()
+    return http.HttpResponse(content = 'done', status = 200)
