@@ -2,6 +2,7 @@
 import urlparse
 
 from django import http
+from django.conf import settings as dsettings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.comments.views import comments as comments_views
 from django.shortcuts import get_object_or_404, render_to_response
@@ -15,28 +16,38 @@ def post_comment(request):
         return result
     else:
         if isinstance(result, comments_views.CommentPostBadRequest):
-            return http.HttpResponseBadRequest()           
-        else:
-            url = urlparse.urlsplit(result['Location'])
-            cid = urlparse.parse_qs(url.query).get('c')
-            try:
-                cid = int(cid[0])
-                comment = models.HComment.objects.get(pk = cid)
-            except:
-                comment = None
+            if dsettings.DEBUG:
+                msg = 'invalid request'
             else:
-                if not comment.is_public:
-                    return http.HttpResponse(content = 'moderated', status = 403)
-                s = request.session.get('user-comments', set())
-                s.add(cid)
-                request.session['user-comments'] = s
-            return render_to_response(
-                'hcomments/show_single_comment.html', {
-                    'c': comment,
-                    'owner': True,
-                },
-                context_instance = RequestContext(request)
-            )
+                msg = ''
+            return http.HttpResponseBadRequest(msg)
+        else:
+            try:
+                url = urlparse.urlsplit(result['Location'])
+                cid = urlparse.parse_qs(url.query).get('c')
+                try:
+                    cid = int(cid[0])
+                    comment = models.HComment.objects.get(pk = cid)
+                except:
+                    comment = None
+                else:
+                    if not comment.is_public:
+                        return http.HttpResponse(content = 'moderated', status = 403)
+                    s = request.session.get('user-comments', set())
+                    s.add(cid)
+                    request.session['user-comments'] = s
+                return render_to_response(
+                    'hcomments/show_single_comment.html', {
+                        'c': comment,
+                        'owner': True,
+                    },
+                    context_instance = RequestContext(request)
+                )
+            except Exception, e:
+                if dsettings.DEBUG:
+                    return http.HttpResponseBadRequest(str(e))
+                else:
+                    raise
 
 def delete_comment(request):
     if request.method != 'POST':

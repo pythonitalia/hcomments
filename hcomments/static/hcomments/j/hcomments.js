@@ -74,9 +74,9 @@ hcomments = {
         var opts = {
             error: bind(function(request, textStatus, errorThrown) {
                 if(request.status == 403)
-                    this.onCommentModerated();
+                    this.onCommentModerated(null);
                 else
-                    this.onCommentPostFailed();
+                    this.onCommentPostFailed(null, request.responseText);
             }, this),
             success: bind(function(data, textStatus) {
                 var data = this.filterOut($(data));
@@ -98,7 +98,10 @@ hcomments = {
     onCommentModerated: function(comment) {
         alert('Your comment has been moderated');
     },
-    onCommentPostFailed: function(comment) {
-        alert('Cannot post your comment');
+    onCommentPostFailed: function(comment, message) {
+        var lbl = 'Cannot post your comment';
+        if(message)
+            lbl += ' (' + message + ')';
+        alert(lbl);
     }
 };
