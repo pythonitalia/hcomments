@@ -1,6 +1,11 @@
 # -*- coding: UTF-8 -*-
 import urlparse
 
+try:
+    parse_qs = urlparse.parse_qs
+except AttributeError:
+    from cgi import parse_qs
+
 from django import http
 from django.conf import settings as dsettings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -24,7 +29,7 @@ def post_comment(request):
         else:
             try:
                 url = urlparse.urlsplit(result['Location'])
-                cid = urlparse.parse_qs(url.query).get('c')
+                cid = parse_qs(url.query).get('c')
                 try:
                     cid = int(cid[0])
                     comment = models.HComment.objects.get(pk = cid)
