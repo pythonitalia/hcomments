@@ -12,8 +12,7 @@ import urllib
 
 register = template.Library()
 
-@register.inclusion_tag('hcomments/show_comment_list.html', takes_context = True)
-def show_comment_list(context, object):
+def _get_comment_list(object):
     ctype = ContentType.objects.get_for_model(object)
     tree = models.HComment.tree.root_nodes().filter(
         content_type = ctype,
@@ -24,7 +23,34 @@ def show_comment_list(context, object):
     comments = []
     for root in tree:
         comments.extend(root.get_descendants(True))
-    context.update({ 'comments': comments })
+    return comments
+
+@register.tag
+def get_comment_list(parser, token):
+    """
+    {% get_comment_list object as comments %}
+    """
+    class Node(template.Node):
+        def __init__(self, object, var_name):
+            self.object = template.Variable(object)
+            self.var_name = var_name
+
+        def render(self, context):
+            context[self.var_name] = _get_comment_list(self.object.resolve(context))
+            return ''
+
+    contents = token.split_contents()
+    tag_name = contents.pop(0)
+    object = contents.pop(0)
+
+    if contents[-2] != 'as':
+        raise template.TemplateSyntaxError("%r tag had invalid arguments" % tag_name)
+    var_name = contents[-1]
+    return Node(object, var_name)
+
+@register.inclusion_tag('hcomments/show_comment_list.html', takes_context = True)
+def show_comment_list(context, object):
+    context.update({ 'comments': _get_comment_list(object) })
     return context
 
 @register.inclusion_tag('hcomments/show_single_comment.html', takes_context = True)
