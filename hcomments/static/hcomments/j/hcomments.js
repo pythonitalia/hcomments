@@ -81,10 +81,14 @@ hcomments = {
             success: bind(function(data, textStatus) {
                 var data = this.filterOut($(data));
                 if(data) {
-                    data
-                        .hide()
-                        .appendTo(comment ? comment : this.wrapper)
-                        .fadeIn("slow");
+                    data.hide();
+                    if(comment) {
+                        comment.after(data);
+                    }
+                    else {
+                        data.appendTo(this.wrapper);
+                    }
+                    data.fadeIn("slow");
                     this.addRemoveLink(data);
                     this.addReplyLink(data);
                 }
