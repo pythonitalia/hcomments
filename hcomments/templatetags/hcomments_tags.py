@@ -65,6 +65,14 @@ def show_single_comment(context, comment):
         'owner': owner,
     }
 
+@register.inclusion_tag('hcomments/show_comment_form.html', takes_context=True)
+def show_comment_form(context, object):
+    ctx = Context(context)
+    ctx.update({
+        'object': object,
+    })
+    return ctx
+
 @register.filter
 def gravatar(email, args=''):
     if args:
