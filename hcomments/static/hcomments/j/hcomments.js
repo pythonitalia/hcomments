@@ -86,7 +86,17 @@ hcomments = {
                         comment.after(data);
                     }
                     else {
-                        data.appendTo(this.wrapper);
+                        /*
+                         * se per qualche motivo il wrapper dei commenti non
+                         * dovesse esister ricarico la pagina, almeno l'utente
+                         * riceve un po' di feedback.
+                         */
+                        if(!this.wrapper.length) {
+                            document.location.reload();
+                            return;
+                        }
+                        else
+                            data.appendTo(this.wrapper);
                     }
                     data.fadeIn("slow");
                     this.addRemoveLink(data);
