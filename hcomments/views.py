@@ -73,6 +73,24 @@ def delete_comment(request):
         comment.delete()
     return http.HttpResponse('')
 
+def subscribe(request):
+    if request.method != 'POST':
+        return http.HttpResponseNotAllowed(('POST',))
+    if not request.user.is_authenticated():
+        return http.HttpResponseBadRequest()
+    content_type = request.POST['content_type']
+    object_pk = request.POST['object_pk']
+
+    app_label, model = content_type.split('.', 1)
+    ct = ContentType.objects.get(app_label=app_label, model=model)
+    object = ct.get_object_for_this_type(pk=object_pk)
+    if 'subscribe' in request.POST:
+        models.ThreadSubscription.objects.subscribe(object, request.user)
+    elif 'unsubscribe' in request.POST:
+        models.ThreadSubscription.objects.unsubscribe(object, request.user)
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
 @staff_member_required
 def moderate_comment(request, cid, public = False):
     try:
