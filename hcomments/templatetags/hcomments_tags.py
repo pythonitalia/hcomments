@@ -7,6 +7,7 @@ import mptt
 import mptt.utils
 
 from hcomments import models
+from hcomments import settings
 
 import hashlib
 import urllib
@@ -50,26 +51,33 @@ def get_comment_list(parser, token):
     return Node(object, var_name)
 
 @register.inclusion_tag('hcomments/show_comment_list.html', takes_context = True)
-def show_comment_list(context, object, object_owner=None):
+def show_comment_list(context, object):
     ctx = Context(context)
     ctx.update({
         'comments': _get_comment_list(object),
-        'object_owner': object_owner,
     })
     return ctx
 
 @register.inclusion_tag('hcomments/show_single_comment.html', takes_context = True)
-def show_single_comment(context, comment, object_owner=None):
+def show_single_comment(context, comment):
     request = context['request']
-    if 'user-comments' in request.session:
-        owner = comment.id in request.session['user-comments']
-    else:
-        owner = False
+    comment_owner = comment.id in request.session.get('user-comments', set())
+    if not comment_owner:
+        comment_owner = settings.MODERATOR_REQUEST(request, comment)
     return {
         'c': comment,
-        'owner': owner,
-        'object_owner': object_owner,
+        'comment_owner': comment_owner,
     }
+
+@register.filter
+def thread_owner(comment):
+    if not comment.user:
+        return False
+    owners = settings.THREAD_OWNERS(comment.content_object)
+    if owners:
+        return comment.user in owners
+    else:
+        return False
 
 @register.inclusion_tag('hcomments/show_comment_form.html', takes_context=True)
 def show_comment_form(context, object):

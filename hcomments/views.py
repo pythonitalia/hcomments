@@ -19,6 +19,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 
 from hcomments import models
+from hcomments import settings
 
 def send_email_to_subscribers(sender, **kwargs):
     subscripted = models.ThreadSubscription.objects.subscriptions(kwargs['instance'].content_object)
@@ -81,16 +82,19 @@ def delete_comment(request):
         cid = int(request.POST['cid'])
     except:
         raise http.HttpResponseBadRequest()
-    s = request.session.get('user-comments', set())
-    if cid not in s:
-        raise http.HttpResponseBadRequest()
-    s.remove(cid)
     try:
         comment = models.HComment.objects.get(pk = cid)
     except models.HComment.DoesNotExist:
-        pass
+        return http.HttpResponse('')
+
+    s = request.session.get('user-comments', set())
+    if cid not in s:
+        if not settings.MODERATOR_REQUEST(request, comment):
+            raise http.HttpResponseBadRequest()
     else:
-        comment.delete()
+        s.remove(cid)
+        request.session['user-comments'] = s
+    comment.delete()
     return http.HttpResponse('')
 
 def subscribe(request):
