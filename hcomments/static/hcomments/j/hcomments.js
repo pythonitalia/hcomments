@@ -36,10 +36,12 @@ hcomments = {
     },
     _onRemoveComment: function(e) {
         e.preventDefault();
-        var p = $(e.target).parents('li');
-        var id = p.attr('id').split('-')[1];
-        $.post(this.remove, { cid: id })
-        p.hide("slow", function() { $(this).remove(); });
+        if(confirm('Are you sure?')) {
+            var p = $(e.target).parents('li');
+            var id = p.attr('id').split('-')[1];
+            $.post(this.remove, { cid: id })
+            p.hide("slow", function() { $(this).remove(); });
+        }
     },
     addReplyLink: function(target) {
         if(!target)
