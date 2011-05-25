@@ -3,7 +3,7 @@
     <h3>{{ comments|length }} {% trans "Commenti" %} (<a href="#add-comment">{% trans "Aggiungi Commento" %}</a>)</h3>
     <ol>
         {% for c in comments %}
-        {% show_single_comment c object_owner %}
+        {% show_single_comment c %}
         {% endfor %}
     </ol>
 </div>
