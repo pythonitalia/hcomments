@@ -30,6 +30,6 @@ setup(name='hcomments',
         'hcomments': sum(map(recurse, ('locale', 'static', 'templates')), []),
     },
     install_requires=[
-        'mptt',
+        'django-mptt',
     ],
 )
