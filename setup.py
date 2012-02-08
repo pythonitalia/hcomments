@@ -16,7 +16,7 @@ def recurse(path):
     return output
 
 setup(name='hcomments',
-    version='0.1',
+    version='0.1.1',
     description='django hierarchical comments',
     author='dvd',
     author_email='dvd@develer.com',
