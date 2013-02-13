@@ -3,9 +3,6 @@ from django import template
 from django.contrib.contenttypes.models import ContentType
 from django.template import Context
 
-import mptt
-import mptt.utils
-
 from hcomments import models
 from hcomments import settings
 

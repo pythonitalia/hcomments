@@ -31,5 +31,6 @@ setup(name='hcomments',
     },
     install_requires=[
         'django-mptt',
+        'django-recaptcha-works',
     ],
 )

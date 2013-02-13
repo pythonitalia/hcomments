@@ -75,8 +75,12 @@ hcomments = {
     _prepareForm: function(form, comment) {
         var opts = {
             error: bind(function(request, textStatus, errorThrown) {
-                if(request.status == 403)
-                    this.onCommentModerated(null);
+                if(request.status == 403) {
+                    if(request.responseText == 'captcha')
+                        this.onCaptchaFailed(null);
+                    else
+                        this.onCommentModerated(null);
+                }
                 else
                     this.onCommentPostFailed(null, request.responseText);
             }, this),
@@ -110,6 +114,9 @@ hcomments = {
             opts.complete = function() { $(form).remove(); };
         }
         return form.ajaxForm(opts);
+    },
+    onCaptchaFailed: function(comment) {
+        alert('You are not human');
     },
     onCommentModerated: function(comment) {
         alert('Your comment has been moderated');

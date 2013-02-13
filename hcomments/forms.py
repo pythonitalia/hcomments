@@ -20,3 +20,7 @@ class HCommentForm(CommentForm):
             data['parent'] = models.HComment.objects.get(id = self.cleaned_data['parent'])
         return data
 
+import recaptcha_works.fields
+
+class HCommentFormWithCaptcha(HCommentForm):
+    captcha = recaptcha_works.fields.RecaptchaField()

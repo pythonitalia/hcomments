@@ -36,44 +36,86 @@ def send_email_to_subscribers(sender, **kwargs):
 post_save.connect(send_email_to_subscribers, sender=Comment)
 post_save.connect(send_email_to_subscribers, sender=models.HComment)
 
+from django.contrib.comments.signals import comment_will_be_posted
+class CaptchaFailed(Exception):
+    pass
+
+def on_comment_will_be_posted(sender, **kw):
+    if sender is not models.HComment:
+        return True
+
+    # se hcomments è configurato per usare recaptcha dobbiamo aggiungere uno
+    # step di validazione qui
+    import hcomments
+    request = kw['request']
+    comment = kw['comment']
+
+    data = request.POST.copy()
+    if request.user.is_authenticated():
+        if not data.get('name', ''):
+            data["name"] = request.user.get_full_name() or request.user.get_username()
+        if not data.get('email', ''):
+            data["email"] = request.user.email
+    form = hcomments.get_form(request)(comment, data)
+    if not form.is_valid():
+        raise CaptchaFailed()
+    return True
+
+comment_will_be_posted.connect(on_comment_will_be_posted)
+
 def post_comment(request):
-    result = comments_views.post_comment(request)
+    from recaptcha_works.decorators import fix_recaptcha_remote_ip
+    try:
+        result = fix_recaptcha_remote_ip(comments_views.post_comment)(request)
+    except CaptchaFailed:
+        result = None
+
     if 'async' not in request.POST:
-        return result
-    else:
-        if isinstance(result, comments_views.CommentPostBadRequest):
-            if dsettings.DEBUG:
-                msg = 'invalid request'
-            else:
-                msg = ''
-            return http.HttpResponseBadRequest(msg)
+        if result:
+            return result
         else:
-            try:
-                url = urlparse.urlsplit(result['Location'])
-                cid = parse_qs(url.query).get('c')
-                try:
-                    cid = int(cid[0])
-                    comment = models.HComment.objects.get(pk = cid)
-                except:
-                    comment = None
-                else:
-                    if not comment.is_public:
-                        return http.HttpResponse(content = 'moderated', status = 403)
-                    s = request.session.get('user-comments', set())
-                    s.add(cid)
-                    request.session['user-comments'] = s
-                return render_to_response(
-                    'hcomments/show_single_comment.html', {
-                        'c': comment,
-                        'owner': True,
-                    },
-                    context_instance = RequestContext(request)
-                )
-            except Exception, e:
-                if dsettings.DEBUG:
-                    return http.HttpResponseBadRequest(str(e))
-                else:
-                    raise
+            return comments_views.CommentPostBadRequest('')
+
+    if result is None:
+        return http.HttpResponse(content='captcha', status=403)
+
+    if isinstance(result, comments_views.CommentPostBadRequest):
+        return http.HttpResponseBadRequest('')
+
+    # quello che segue è codice piuttosto brutto. Purtroppo la post_comment
+    # restituisce un HttpResponse e da quello l'unico modo che ho per dedurre
+    # il commento appena generato è analizzare l'header Location
+    try:
+        loc = result['Location']
+    except:
+        return http.HttpResponseBadRequest('')
+
+    try:
+        url = urlparse.urlsplit(loc)
+        cid = parse_qs(url.query).get('c')
+        try:
+            cid = int(cid[0])
+            comment = models.HComment.objects.get(pk = cid)
+        except:
+            comment = None
+        else:
+            if not comment.is_public:
+                return http.HttpResponse(content='moderated', status=403)
+            s = request.session.get('user-comments', set())
+            s.add(cid)
+            request.session['user-comments'] = s
+        return render_to_response(
+            'hcomments/show_single_comment.html', {
+                'c': comment,
+                'owner': True,
+            },
+            context_instance = RequestContext(request)
+        )
+    except Exception, e:
+        if dsettings.DEBUG:
+            return http.HttpResponseBadRequest(str(e))
+        else:
+            raise
 
 def delete_comment(request):
     if request.method != 'POST':
