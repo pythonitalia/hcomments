@@ -39,3 +39,6 @@ class ThreadSubscription(models.Model):
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     objects = ThreadSubscriptionManager()
+
+    class Meta:
+        unique_together = ('user', 'object_id', 'content_type')
