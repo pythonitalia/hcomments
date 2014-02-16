@@ -1,6 +1,6 @@
 {% load i18n hcomments_tags %}
 {% if request.user.is_authenticated %}
-<form action="{% url hcomments-subscribe %}" method="POST">{% csrf_token %}
+<form action="{% url "hcomments-subscribe" %}" method="POST">{% csrf_token %}
     {{ form.content_type }}
     {{ form.object_pk }}
     <div>
