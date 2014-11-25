@@ -88,28 +88,25 @@ hcomments = {
                 var comment = $.trim($comment.val());
                 var name = $.trim($name.val());
                 var email = $.trim($email.val());
+                var captcha = $.trim($captcha.val());
 
                 var error = false;
                 var $toFocus;
 
-                if ($captcha.length >= 1) {
-                    var val = $.trim($captcha.val());
+                if ($captcha.length > 0 && captcha === '') {
+                    error = true;
 
-                    if (val === '') {
-                        error = true;
-
-                        $toFocus = $captcha.addClass('error');
-                        $('#recaptcha_widget_div').addClass('error');
-                    }
+                    $toFocus = $captcha.addClass('error');
+                    $('#recaptcha_widget_div').addClass('error');
                 }
 
-                if (email === '' || !isEmail(email)) {
+                if ($email.length > 0 && (email === '' || !isEmail(email))) {
                     error = true;
 
                     $toFocus = $email.addClass('error');
                 }
 
-                if (name === '') {
+                if ($email.length > 0 && name === '') {
                     error = true;
 
                     $toFocus = $name.addClass('error');
