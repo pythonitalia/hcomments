@@ -5,6 +5,11 @@ function bind(f, scope) {
     return wrapper;
 };
 
+function isEmail(email) {
+  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  return regex.test(email);
+}
+
 hcomments = {
     comments: function(o) {
         this.form = o.form;
@@ -74,6 +79,51 @@ hcomments = {
     },
     _prepareForm: function(form, comment) {
         var opts = {
+            beforeSubmit: function(formData, jqForm, options) {
+                var $comment = jqForm.find('[name=comment]');
+                var $name = jqForm.find('[name=name]');
+                var $email = jqForm.find('[name=email]');
+                var $captcha = jqForm.find('[name=recaptcha_response_field]');
+
+                var comment = $.trim($comment.val());
+                var name = $.trim($name.val());
+                var email = $.trim($email.val());
+                var captcha = $.trim($captcha.val());
+
+                var error = false;
+                var $toFocus;
+
+                if ($captcha.length > 0 && captcha === '') {
+                    error = true;
+
+                    $toFocus = $captcha.addClass('error');
+                    $('#recaptcha_widget_div').addClass('error');
+                }
+
+                if ($email.length > 0 && (email === '' || !isEmail(email))) {
+                    error = true;
+
+                    $toFocus = $email.addClass('error');
+                }
+
+                if ($email.length > 0 && name === '') {
+                    error = true;
+
+                    $toFocus = $name.addClass('error');
+                }
+
+                if (comment === '') {
+                    error = true;
+
+                    $toFocus = $comment.addClass('error');
+                }
+
+                if ($toFocus) {
+                    $toFocus.focus();
+                }
+
+                return !error;
+            },
             error: bind(function(request, textStatus, errorThrown) {
                 if(request.status == 403) {
                     if(request.responseText == 'captcha')
